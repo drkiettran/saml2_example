@@ -1,4 +1,5 @@
 # SAML2 Coding Example.
+
 This projects show how you may be able to create a Spring Boot application that uses SAML V2 for SSO with an Identity Provider.
 This work is based on this repository: `https://github.com/oktadev/okta-spring-boot-saml-example` and this web page: `https://www.chakray.com/wso2-identity-server-integration-spring-boot-security-saml/`
 
@@ -31,10 +32,10 @@ I updated the `pom.xml` file to include the following libraries:
 			<artifactId>spring-security-saml-dsl-core</artifactId>
 			<version>1.0.5.RELEASE</version>
 		</dependency>
-		<!-- SAML2 Dependencies -->
+<!-- SAML2 Dependencies -->
 ```
 
-I added a Java class `IndexController.java`. This class just serve an `index` url.
+I added a Java class `IndexController.java`. This class just serve an `index` URL.
 
 ```java
 package com.drkiettran.saml2_example;
@@ -192,3 +193,44 @@ docker run --restart=always -d -p $EXT_PORT_NO:$INT_PORT_NO \
 docker logs --follow $CONTAINER_NAME
 
 ```
+
+## Step `4` Configuring an application with WSO2
+
+- I logged in to wso2 using `uid/psw` as `admin/admin`. 
+- I created a new service provider from the left panel as in `Service Provider / Add`.
+- I entered `Service Provder Name` as Spring SAML2
+- I clicked on `Register` button.
+- I then entered the `Application Sertificate` by browsing to my `resources/saml/saml2.pem` as I created in `step 2` above. It actually copied the content of the `pem` file into the text box.
+- I then clicked on `Inbound Authentication Configuration` tab.
+- I chose SAML2 Web SSO Configuration tab
+- I then clicked on `Configure` link.
+- I entered `Issuer` as `https://localhost:8443/saml/metadata`.
+- I added three more `Assertion Consumer URLs` as: `https://localhost:8443/saml/metadata`, `https://localhost:8443/saml/SSO`, `https://localhost:8443`
+- I made sure to check these, `Enable Response Signing`, `Enable Signature Validation in Authentication Requests and Logout Requests`, `Enable Single Logout`, `Enable Attribute Profile/Include Attributes in the Response Always` and `Enable IdP Initiated SSO`.
+- I clicked on `Update` button
+
+## Step `5` Create a Login Role
+
+- I clicked on `Add` from `Users and Roles` tab on the left pane. 
+- I clicked on `Add New Role`.
+- I selected `PRIMARY` and entered new `Role` name as `Login`
+- I clicked on `Next`, and select `Login` role.
+- I select `All Permissions/Admin Permissions/Login`.
+- I clicked on `Finish`.
+
+## Step `6` Adding User and Assign Roles
+
+- I clicked on `Add` from `Users and Roles` tab on the left pane. 
+- I clicked on `Add New User`.
+- I selected `PRIMARY` `Domain`, entered `Username` and `Password`.
+- I clicked on `Next`, and select `Login` role.
+- I clicked on `Finish`.
+
+## Step `7` Exporting SAML2 metadata file
+
+- I clicked `Resident` of `Identity Provider` on the left panel.
+- I expanded `Inbound Authentication Configuration/SAMLE2 Web SSO Configuration`.
+- I clicked on `Download SAML Metadata`.
+- I save the file under `src/main/resources/saml/` directory as `metadata.xml`.
+
+
